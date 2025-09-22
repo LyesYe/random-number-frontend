@@ -136,48 +136,7 @@ const ProgressDot = styled.div`
 
 
 
-const LogsSection = styled.div`
-  margin-top: 20px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  max-height: 200px;
-  overflow-y: auto;
-`;
 
-const LogsTitle = styled.h4`
-  color: white;
-  margin: 0 0 12px 0;
-  font-size: 1rem;
-  font-weight: 600;
-`;
-
-const LogEntry = styled.div`
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.9rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const LogText = styled.span`
-  color: rgba(255, 255, 255, 0.8);
-`;
-
-const LogStatus = styled.span`
-  font-weight: 600;
-  ${props => props.correct ? `
-    color: #00ff88;
-  ` : `
-    color: #ff4444;
-  `}
-`;
 
 const ServerTimeDisplay = styled.div`
   background: rgba(255, 255, 255, 0.05);
@@ -290,7 +249,6 @@ function LockScreen({ onUnlock }) {
   const [predictions, setPredictions] = useState([]);
   const [correctCount, setCorrectCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [predictionLogs, setPredictionLogs] = useState([]);
   const [cooldownActive, setCooldownActive] = useState(false);
   const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
   // Timer states for progress circle
@@ -318,26 +276,7 @@ function LockScreen({ onUnlock }) {
     return generateNumberForTime(hour, minute);
   }, [generateNumberForTime]);
 
-  // Calculate previous number (minute - 1)
-  const calculatePreviousNumber = useCallback(() => {
-    const now = new Date();
-    let hour = now.getHours();
-    let minute = now.getMinutes();
-    
-    // Handle minute rollover
-    if (minute === 0) {
-      minute = 59;
-      hour = hour === 0 ? 23 : hour - 1;
-    } else {
-      minute = minute - 1;
-    }
-    
-    // Use 24 for hour 0, 60 for minute 0
-    const adjustedHour = hour === 0 ? 24 : hour;
-    const adjustedMinute = minute === 0 ? 60 : minute;
-    
-    return generateNumberForTime(adjustedHour, adjustedMinute);
-  }, [generateNumberForTime]);
+
   
   // Initialize previous numbers on component mount
   useEffect(() => {
@@ -462,8 +401,7 @@ function LockScreen({ onUnlock }) {
       timestamp: new Date()
     };
 
-    // Add to logs
-    setPredictionLogs(prev => [newPrediction, ...prev]);
+
 
     setPredictions(prev => [newPrediction, ...prev.slice(0, 2)]);
     

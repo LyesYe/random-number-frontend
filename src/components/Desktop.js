@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FiFile, FiDownload, FiX, FiFolder } from 'react-icons/fi';
+import { FiFile, FiDownload, FiX } from 'react-icons/fi';
 import Taskbar from './Taskbar';
 
 const DesktopContainer = styled.div`

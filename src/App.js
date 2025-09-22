@@ -9,9 +9,7 @@ function App() {
     setIsLocked(false);
   };
 
-  const handleLock = () => {
-    setIsLocked(true);
-  };
+
 
   return (
     <div className="App">

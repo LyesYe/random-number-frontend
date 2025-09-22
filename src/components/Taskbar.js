@@ -120,8 +120,8 @@ function Taskbar() {
         
         <TimeDisplay>
               ({(() => {
-                const hour = currentTime.getHours() || 24;
-                const minute = currentTime.getMinutes() || 60;
+                const hour = currentTime.getHours();
+                const minute = currentTime.getMinutes();
                 
                 return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
               })()})

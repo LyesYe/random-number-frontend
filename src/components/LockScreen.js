@@ -270,8 +270,8 @@ function LockScreen({ onUnlock }) {
   // Calculate current number using local time
   const calculateCurrentNumber = useCallback(() => {
     const now = new Date();
-    const hour = now.getHours() || 24; // Use 24 if hour is 0
-    const minute = now.getMinutes() || 60; // Use 60 if minute is 0
+    const hour = now.getHours();
+    const minute = now.getMinutes();
     
     return generateNumberForTime(hour, minute);
   }, [generateNumberForTime]);
@@ -299,9 +299,7 @@ function LockScreen({ onUnlock }) {
           }
         }
         
-        const adjustedHour = hour === 0 ? 24 : hour;
-        const adjustedMinute = minute === 0 ? 60 : minute;
-        numbers.unshift(generateNumberForTime(adjustedHour, adjustedMinute));
+        numbers.unshift(generateNumberForTime(hour, minute));
       }
       
       setPreviousNumbers(numbers);

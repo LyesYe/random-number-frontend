@@ -229,15 +229,51 @@ const PreviousNumberItem = styled.div`
 `;
 
 const PredictionResult = styled.div`
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  border-radius: 12px;
   text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
-  background: ${props => props.isCorrect ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 69, 58, 0.1)'};
-  border: 1px solid ${props => props.isCorrect ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 69, 58, 0.3)'};
+  font-size: 1.2rem;
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  animation: slideInFromTop 0.5s ease-out;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  
+  background: ${props => props.isCorrect 
+    ? 'linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 200, 100, 0.15) 100%)' 
+    : 'linear-gradient(135deg, rgba(255, 69, 58, 0.2) 0%, rgba(255, 100, 80, 0.15) 100%)'};
+  
+  border: 2px solid ${props => props.isCorrect ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 69, 58, 0.4)'};
   color: ${props => props.isCorrect ? '#00ff88' : '#ff453a'};
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes slideInFromTop {
+    from {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
 `;
 
 
@@ -488,13 +524,19 @@ function LockScreen({ onUnlock }) {
           ))}
         </ProgressContainer>
         
+        {predictionResult !== null && (
+          <PredictionResult isCorrect={predictionResult}>
+            {predictionResult ? '🎉 Bonne prédiction !' : '❌ Mauvaise prédiction'}
+          </PredictionResult>
+        )}
+        
         <PredictionInput
           type="number"
           min="0"
           max="99"
           value={prediction}
           onChange={(e) => setPrediction(e.target.value)}
-          placeholder={cooldownActive ? `Attendez ${cooldownTimeLeft}s` : "Entrez votre prédiction (0-99)"}
+          placeholder="Entrez votre prédiction (0-99)"
           onKeyPress={handleKeyPress}
           disabled={isLoading || cooldownActive}
         />
@@ -517,12 +559,6 @@ function LockScreen({ onUnlock }) {
             </>
           )}
         </PredictButton>
-        
-        {predictionResult !== null && (
-          <PredictionResult isCorrect={predictionResult}>
-            {predictionResult ? 'Bonne prédiction !' : 'Mauvaise prédiction'}
-          </PredictionResult>
-        )}
 
       </PredictionPanel>
       

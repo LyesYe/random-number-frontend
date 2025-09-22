@@ -253,7 +253,7 @@ function Desktop() {
       name: 'firebase-config.json',
       type: 'json',
       size: '1.8 KB',
-      description: 'Configuration file for cloud services',
+      description: 'Fichier de configuration pour les services cloud',
       icon: <FiFile size={24} color="white" />
     }
   ];
@@ -294,7 +294,7 @@ function Desktop() {
     <DesktopContainer>
       {showWelcome && (
         <WelcomeMessage>
-          🎉 Access Granted! Welcome to the Lab System
+          🎉 Accès Accordé! Bienvenue dans le Système de Laboratoire
         </WelcomeMessage>
       )}
       
@@ -326,11 +326,11 @@ function Desktop() {
             
             <FileInfo>
               <InfoRow>
-                <span>File Type:</span>
+                <span>Type de Fichier:</span>
                 <strong>{selectedFile.type.toUpperCase()}</strong>
               </InfoRow>
               <InfoRow>
-                <span>File Size:</span>
+                <span>Taille du Fichier:</span>
                 <strong>{selectedFile.size}</strong>
               </InfoRow>
               <InfoRow>
@@ -339,13 +339,13 @@ function Desktop() {
               </InfoRow>
               <InfoRow>
                 <span>Source:</span>
-                <strong>External Hosting</strong>
+                <strong>Hébergement Externe</strong>
               </InfoRow>
             </FileInfo>
             
             <DownloadButton onClick={() => handleDownload(selectedFile)}>
               <FiDownload size={20} />
-              Download File
+              Télécharger le Fichier
             </DownloadButton>
           </ModalContent>
         </Modal>

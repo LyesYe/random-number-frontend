@@ -109,7 +109,7 @@ function Taskbar() {
     <TaskbarContainer>
       <StartButton>
         <span style={{ fontSize: '16px', marginRight: '4px' }}>⊞</span>
-        Start
+        Démarrer
       </StartButton>
       
       <SystemTray>

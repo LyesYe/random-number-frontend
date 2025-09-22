@@ -190,17 +190,55 @@ const ServerTimeDisplay = styled.div`
 
 
 
-const CurrentNumberDisplay = styled.div`
+const ProgressCircleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+`;
+
+const ProgressCircle = styled.div`
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #00ff88 0deg,
+    #00ff88 ${props => props.progress * 3.6}deg,
+    rgba(255, 255, 255, 0.1) ${props => props.progress * 3.6}deg,
+    rgba(255, 255, 255, 0.1) 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.8);
+  }
+`;
+
+const ProgressContent = styled.div`
+  position: relative;
+  z-index: 1;
   color: #00ff88;
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 4px;
+  text-align: center;
 `;
 
-const FormulaText = styled.div`
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.8rem;
+const ProgressLabel = styled.div`
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  text-align: center;
 `;
+
+
 
 
 
@@ -212,6 +250,10 @@ function LockScreen({ onUnlock }) {
   const [predictionLogs, setPredictionLogs] = useState([]);
   const [cooldownActive, setCooldownActive] = useState(false);
   const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
+  // Timer states for progress circle
+  const [timerProgress, setTimerProgress] = useState(0);
+  const [previousNumber, setPreviousNumber] = useState(null);
+  const [showPreviousNumber, setShowPreviousNumber] = useState(false);
   // Removed sessionId as it's no longer needed for local operation
 
 
@@ -229,8 +271,7 @@ function LockScreen({ onUnlock }) {
   
 
 
-  // State for current number display
-  const [currentNumber, setCurrentNumber] = useState(0);
+
   
   // Calculate current number using local time
   const calculateCurrentNumber = useCallback(() => {
@@ -243,20 +284,37 @@ function LockScreen({ onUnlock }) {
     return product % 100;
   }, []);
   
-  // Update current number every second
+  // Timer effect for progress circle and number updates
   useEffect(() => {
-    const updateNumber = () => {
-      setCurrentNumber(calculateCurrentNumber());
-    };
+    let lastMinute = -1;
+    let currentNum = calculateCurrentNumber();
     
-    // Update immediately
-    updateNumber();
-    
-    // Update every second
-    const interval = setInterval(updateNumber, 1000);
+    const interval = setInterval(() => {
+      const now = new Date();
+      const currentMinute = now.getMinutes();
+      const seconds = now.getSeconds();
+      
+      // Calculate progress based on seconds (0-59 seconds = 0-100%)
+      const progress = (seconds / 60) * 100;
+      setTimerProgress(progress);
+      
+      // When minute changes, update the previous number
+      if (lastMinute !== -1 && currentMinute !== lastMinute) {
+        setPreviousNumber(currentNum);
+        setShowPreviousNumber(true);
+        currentNum = calculateCurrentNumber(); // Get new current number
+      }
+      
+      // Hide previous number when new minute starts (at 0 seconds)
+      if (seconds === 0 && showPreviousNumber) {
+        setShowPreviousNumber(false);
+      }
+      
+      lastMinute = currentMinute;
+    }, 100); // Update every 100ms for smooth progress
     
     return () => clearInterval(interval);
-  }, [calculateCurrentNumber]);
+  }, [calculateCurrentNumber, showPreviousNumber]);
 
   // Handle cooldown timer
   useEffect(() => {
@@ -275,12 +333,12 @@ function LockScreen({ onUnlock }) {
 
   const submitPrediction = () => {
     if (cooldownActive) {
-      alert(`Please wait ${cooldownTimeLeft} seconds before making another prediction`);
+      alert(`Veuillez attendre ${cooldownTimeLeft} secondes avant de faire une autre prédiction`);
       return;
     }
 
     if (!prediction || isNaN(prediction) || prediction < 0 || prediction > 99) {
-      alert('Please enter a valid number between 0 and 99');
+      alert('Veuillez entrer un nombre valide entre 0 et 99');
       return;
     }
 
@@ -342,22 +400,26 @@ function LockScreen({ onUnlock }) {
         <FiUser size={48} color="white" />
       </UserAvatar>
       
-      <UserName>DNA DATABASE Access</UserName>
-      <StatusText>Enter 3 consecutive correct predictions to unlock</StatusText>
+      <UserName>Accès BASE DE DONNÉES ADN</UserName>
+      <StatusText>Entrez 3 prédictions consécutives correctes pour déverrouiller</StatusText>
       
       <PredictionPanel>
         <PredictionTitle>
           <FiLock size={20} />
-          Security Lock
+          Verrou de Sécurité
         </PredictionTitle>
         
         <ServerTimeDisplay>
-          <CurrentNumberDisplay>
-            Current Number: {currentNumber}
-          </CurrentNumberDisplay>
-          <FormulaText>
-          Security Algorithm: Time-based calculation
-        </FormulaText>
+          <ProgressCircleContainer>
+            <ProgressCircle progress={timerProgress}>
+              <ProgressContent>
+              {previousNumber !== null ? previousNumber : 0}
+            </ProgressContent>
+          </ProgressCircle>
+          <ProgressLabel>
+            Ancien Numéro Généré
+          </ProgressLabel>
+          </ProgressCircleContainer>
         </ServerTimeDisplay>
         
         <ProgressContainer>
@@ -379,7 +441,7 @@ function LockScreen({ onUnlock }) {
           max="99"
           value={prediction}
           onChange={(e) => setPrediction(e.target.value)}
-          placeholder={cooldownActive ? `Wait ${cooldownTimeLeft}s` : "Enter prediction (0-99)"}
+          placeholder={cooldownActive ? `Attendez ${cooldownTimeLeft}s` : "Entrez votre prédiction (0-99)"}
           onKeyPress={handleKeyPress}
           disabled={isLoading || cooldownActive}
         />
@@ -388,31 +450,31 @@ function LockScreen({ onUnlock }) {
           {isLoading ? (
             <>
               <div className="spinner" />
-              Processing...
+              Traitement...
             </>
           ) : cooldownActive ? (
             <>
               <FiActivity />
-              Wait {cooldownTimeLeft}s
+              Attendre {cooldownTimeLeft}s
             </>
           ) : (
             <>
               <FiActivity />
-              Predict
+              Prédire
             </>
           )}
         </PredictButton>
         
         <LogsSection>
-          <LogsTitle>Prediction Logs</LogsTitle>
+          <LogsTitle>Historique de Prédictions</LogsTitle>
           {predictionLogs.length === 0 ? (
-            <LogText>No predictions yet...</LogText>
+            <LogText>Aucune prédiction pour le moment...</LogText>
           ) : (
             predictionLogs.map((log, index) => (
               <LogEntry key={index}>
-                <LogText>Guess: {log.predicted} | Generated: {log.actual}</LogText>
+                <LogText>Prédiction: {log.predicted} | Généré: {log.actual}</LogText>
                 <LogStatus correct={log.correct}>
-                  {log.correct ? 'CORRECT' : 'WRONG'}
+                  {log.correct ? 'CORRECT' : 'FAUX'}
                 </LogStatus>
               </LogEntry>
             ))

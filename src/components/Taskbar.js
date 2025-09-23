@@ -57,6 +57,42 @@ const TimeDisplay = styled.div`
   height: 100%;
 `;
 
+const OverlapContainer = styled.span`
+  display: inline-block;
+  position: relative;
+  width: auto;
+  height: 16px;
+  vertical-align: baseline;
+`;
+
+const ColonChar = styled.span`
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1;
+`;
+
+const XChar = styled.span`
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 16px;
+  color: transparent;
+  line-height: 1;
+  
+  ::selection {
+    color: white;
+    background-color: rgba(0, 123, 255, 0.3);
+  }
+  
+  ::-moz-selection {
+    color: white;
+    background-color: rgba(0, 123, 255, 0.3);
+  }
+`;
+
 const BatteryContainer = styled.div`
   display: flex;
   align-items: center;
@@ -122,12 +158,23 @@ function Taskbar() {
         </IconContainer>
         
         <TimeDisplay>
-              ({(() => {
+              {(() => {
                 const hour = currentTime.getHours();
                 const minute = currentTime.getMinutes();
                 
-                return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-              })()})
+                return (
+                  <>
+                    {hour.toString().padStart(2, '0')}
+                    <span style={{ marginLeft: '4px', marginRight: '8px' }}>
+                <OverlapContainer>
+                  <ColonChar>:</ColonChar>
+                  <XChar>x</XChar>
+                </OverlapContainer>
+              </span>
+                    {minute.toString().padStart(2, '0')}
+                  </>
+                );
+              })()}
             </TimeDisplay>
         
         <BatteryContainer>

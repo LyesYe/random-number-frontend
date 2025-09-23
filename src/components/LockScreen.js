@@ -300,7 +300,8 @@ function LockScreen({ onUnlock }) {
   // Generate number for specific time
   const generateNumberForTime = useCallback((hour, minute) => {
     const product = hour * minute;
-    return product % 100;
+    // If minute is even (pair), use % 97, if odd (impair), use % 17
+    return minute % 2 === 0 ? product % 97 : product % 17;
   }, []);
 
   // Calculate current number using local time

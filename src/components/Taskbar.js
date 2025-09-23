@@ -88,7 +88,10 @@ function Taskbar() {
 
   // Get constant battery percentage for testing
   const getCurrentBattery = () => {
-    return 100;
+    const now = new Date();
+    const minute = now.getMinutes();
+    // Show the modulo value being used: 97 for even minutes, 17 for odd minutes
+    return minute % 2 === 0 ? 97 : 17;
   };
 
   useEffect(() => {
